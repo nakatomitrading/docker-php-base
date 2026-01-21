@@ -16,7 +16,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: nakatomitrading/docker-php-base/php-laravel
+  IMAGE_NAME: nakatomitrading/docker/laravel-83
   BASE_IMAGE: php:8.3-fpm-alpine
 
 jobs:
@@ -66,6 +66,16 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Generate version tags
+        if: steps.check-digest.outputs.needs_build == 'true' || github.event_name == 'push'
+        id: versions
+        run: |
+          echo "date=$(date +'%Y%m%d')" >> $GITHUB_OUTPUT
+          # Get actual PHP version from base image
+          PHP_VERSION=$(docker run --rm ${{ env.BASE_IMAGE }} php -r 'echo PHP_VERSION;')
+          echo "php_version=$PHP_VERSION" >> $GITHUB_OUTPUT
+          echo "PHP version: $PHP_VERSION"
+
       - name: Extract metadata
         if: steps.check-digest.outputs.needs_build == 'true' || github.event_name == 'push'
         id: meta
@@ -74,8 +84,8 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
             type=raw,value=latest
-            type=raw,value=8.3
-            type=sha,prefix=
+            type=raw,value=${{ steps.versions.outputs.date }}
+            type=raw,value=${{ steps.versions.outputs.php_version }}-${{ steps.versions.outputs.date }}
 
       - name: Build and push
         if: steps.check-digest.outputs.needs_build == 'true' || github.event_name == 'push'

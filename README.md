@@ -5,7 +5,7 @@ Pre-built PHP 8.3 FPM Alpine image with all common Laravel extensions compiled.
 ## Usage
 
 ```dockerfile
-FROM ghcr.io/nakatomitrading/docker-php-base/php-laravel:8.3
+FROM ghcr.io/nakatomitrading/docker/laravel-83:latest
 
 COPY . .
 RUN composer install --no-dev --optimize-autoloader
@@ -42,8 +42,11 @@ CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
 
 ## Tags
 
-- `latest`, `8.3` - Current PHP 8.3 build
-- `sha-xxxxxx` - Specific commit builds
+- `latest` - Most recent build
+- `YYYYMMDD` - Dated builds (e.g., `20260121`)
+- `8.3.x-YYYYMMDD` - Full PHP version + date (e.g., `8.3.15-20260121`)
+
+Use dated tags to pin a known-good version.
 
 ## Auto-rebuild
 
